@@ -8,6 +8,13 @@ add_executable(
     main_app_reader.c
 )
 
+target_link_libraries(
+    ${READER_APP_EXEC_NAME}
+
+    PUBLIC
+        GALI::utils
+)
+
 add_custom_target(
     run_app
 
