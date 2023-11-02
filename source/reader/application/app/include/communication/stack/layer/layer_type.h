@@ -1,0 +1,22 @@
+#ifndef SOURCE_READER_APPLICATION_APP_INCLUDE_COMMUNICATION_STACK_LAYER_LAYER_TYPE
+#define SOURCE_READER_APPLICATION_APP_INCLUDE_COMMUNICATION_STACK_LAYER_LAYER_TYPE
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef enum CommLayerType
+{
+    COMM_LAYER_TYPE__PIMA,
+    COMM_LAYER_TYPE__ABNT_14522_UO,
+    COMM_LAYER_TYPE__ABNT_14522,
+
+    COMM_LAYER_TYPE__N_TYPE
+
+} CommLayerType;
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

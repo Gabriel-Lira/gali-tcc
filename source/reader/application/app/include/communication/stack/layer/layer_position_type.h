@@ -1,0 +1,22 @@
+#ifndef SOURCE_READER_APPLICATION_APP_INCLUDE_COMMUNICATION_STACK_LAYER_LAYER_POSITION_TYPE
+#define SOURCE_READER_APPLICATION_APP_INCLUDE_COMMUNICATION_STACK_LAYER_LAYER_POSITION_TYPE
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef enum CommLayerPositionType
+{
+    COMM_LAYER__HIGHER,
+    COMM_LAYER__SAME,
+    COMM_LAYER__LOWER,
+
+    COMM_LAYER__N_ELEMENTS
+
+} CommLayerPositionType;
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
