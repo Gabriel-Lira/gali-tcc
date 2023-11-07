@@ -28,7 +28,7 @@ struct Callback<Ret(Params...)>
 template <typename Ret, typename... Params>
 std::function<Ret(Params...)> Callback<Ret(Params...)>::func;
 
-gali::ImguiWindow::ImguiWindow(void (&app_function)())
+gali::ImguiWindow::ImguiWindow()
 {
     // Store member function and the instance using std::bind.
     // Callback<void(int *)>::func = std::bind(&gali::ImguiWindow::WndProc, &*this, std::placeholders::_1);
@@ -43,14 +43,14 @@ gali::ImguiWindow::ImguiWindow(void (&app_function)())
 
     // Create application window
     // ImGui_ImplWin32_EnableDpiAwareness();
-    WNDCLASSEXW wc = {sizeof(wc), CS_CLASSDC, c_func,           0L,     0L, GetModuleHandle(nullptr), nullptr, nullptr,
-                      nullptr,    nullptr,    L"ImGui Example", nullptr};
+    wc = {sizeof(wc), CS_CLASSDC, c_func,           0L,     0L, GetModuleHandle(nullptr), nullptr, nullptr,
+          nullptr,    nullptr,    L"ImGui Example", nullptr};
     ::RegisterClassExW(&wc);
-    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Dear ImGui DirectX11 Example", WS_OVERLAPPEDWINDOW, 100, 100, 1280,
-                                800, nullptr, nullptr, wc.hInstance, nullptr);
+    hwnd = ::CreateWindowW(wc.lpszClassName, L"Dear ImGui DirectX11 Example", WS_OVERLAPPEDWINDOW, 100, 100, 1280, 800,
+                           nullptr, nullptr, wc.hInstance, nullptr);
 
     // Initialize Direct3D
-    if (!CreateDeviceD3D(hwnd))
+    if (!CreateDeviceD3D())
     {
         CleanupDeviceD3D();
         ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
@@ -76,27 +76,10 @@ gali::ImguiWindow::ImguiWindow(void (&app_function)())
     // Setup Platform/Renderer backends
     ImGui_ImplWin32_Init(hwnd);
     ImGui_ImplDX11_Init(pd3dDevice, pd3dDeviceContext);
+}
 
-    // Load Fonts
-    // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use
-    // ImGui::PushFont()/PopFont() to select them.
-    // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
-    // - If the file cannot be loaded, the function will return a nullptr. Please handle those errors in your
-    // application (e.g. use an assertion, or display an error and quit).
-    // - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling
-    // ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
-    // - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
-    // - Read 'docs/FONTS.md' for more instructions and details.
-    // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double
-    // backslash \\ !
-    // io.Fonts->AddFontDefault();
-    // io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
-    // io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-    // io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-    // io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-    // ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr,
-    // io.Fonts->GetGlyphRangesJapanese()); IM_ASSERT(font != nullptr);
-
+void gali::ImguiWindow::run(void (&app_function)())
+{
     // Our state
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -148,17 +131,23 @@ gali::ImguiWindow::ImguiWindow(void (&app_function)())
         pSwapChain->Present(1, 0); // Present with vsync
         // g_pSwapChain->Present(0, 0); // Present without vsync
     }
-
-    // Cleanup
 }
 
 gali::ImguiWindow::~ImguiWindow()
 {
+    // Cleanup
+    ImGui_ImplDX11_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
+
+    CleanupDeviceD3D();
+    ::DestroyWindow(hwnd);
+    ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
 }
 
 // Helper functions
 
-bool gali::ImguiWindow::CreateDeviceD3D(HWND hWnd)
+bool gali::ImguiWindow::CreateDeviceD3D()
 {
     // Setup swap chain
     DXGI_SWAP_CHAIN_DESC sd;
@@ -171,7 +160,7 @@ bool gali::ImguiWindow::CreateDeviceD3D(HWND hWnd)
     sd.BufferDesc.RefreshRate.Denominator = 1;
     sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
     sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    sd.OutputWindow = hWnd;
+    sd.OutputWindow = hwnd;
     sd.SampleDesc.Count = 1;
     sd.SampleDesc.Quality = 0;
     sd.Windowed = TRUE;

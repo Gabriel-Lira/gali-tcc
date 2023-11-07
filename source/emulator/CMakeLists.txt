@@ -7,7 +7,7 @@ add_executable(
 
     main_emulator.cpp
 
-    ./src/emulator_window.cpp
+    ./src/imgui_window.cpp
 )
 
 target_include_directories(
