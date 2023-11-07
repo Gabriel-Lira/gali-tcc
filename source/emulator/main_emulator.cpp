@@ -1,4 +1,4 @@
-#include "emulator_window.hpp"
+#include "imgui_window.hpp"
 
 void test()
 {
@@ -6,7 +6,7 @@ void test()
 
 int main(int argc, char const *argv[])
 {
-    static gali::EmulatorWindow emu_win(test);
+    static gali::ImguiWindow emu_win(test);
 
     return 0;
 }

@@ -5,27 +5,45 @@
 #include "imgui_impl_dx11.h"
 #include "imgui_impl_win32.h"
 
-#include "emulator_window.hpp"
+#include "imgui_window.hpp"
 
-// Data
-static ID3D11Device *g_pd3dDevice = nullptr;
-static ID3D11DeviceContext *g_pd3dDeviceContext = nullptr;
-static IDXGISwapChain *g_pSwapChain = nullptr;
-static UINT g_ResizeWidth = 0, g_ResizeHeight = 0;
-static ID3D11RenderTargetView *g_mainRenderTargetView = nullptr;
+// TODO: Change this to a utils lib
+#include <functional>
 
-// Forward declarations of helper functions
-bool CreateDeviceD3D(HWND hWnd);
-void CleanupDeviceD3D();
-void CreateRenderTarget();
-void CleanupRenderTarget();
-LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+template <typename T>
+struct Callback;
 
-gali::EmulatorWindow::EmulatorWindow(void (&app_function)())
+template <typename Ret, typename... Params>
+struct Callback<Ret(Params...)>
 {
+    template <typename... Args>
+    static Ret callback(Args... args)
+    {
+        return func(args...);
+    }
+    static std::function<Ret(Params...)> func;
+};
+
+// Initialize the static member.
+template <typename Ret, typename... Params>
+std::function<Ret(Params...)> Callback<Ret(Params...)>::func;
+
+gali::ImguiWindow::ImguiWindow(void (&app_function)())
+{
+    // Store member function and the instance using std::bind.
+    // Callback<void(int *)>::func = std::bind(&gali::ImguiWindow::WndProc, &*this, std::placeholders::_1);
+    Callback<LRESULT WINAPI(HWND, UINT, WPARAM, LPARAM)>::func =
+        std::bind(&gali::ImguiWindow::WndProc, this, std::placeholders::_1, std::placeholders::_2,
+                  std::placeholders::_3, std::placeholders::_4);
+
+    // Convert callback-function to c-pointer.
+    LRESULT(*c_func)
+    (HWND, UINT, WPARAM, LPARAM) =
+        static_cast<decltype(c_func)>(Callback<LRESULT WINAPI(HWND, UINT, WPARAM, LPARAM)>::callback);
+
     // Create application window
     // ImGui_ImplWin32_EnableDpiAwareness();
-    WNDCLASSEXW wc = {sizeof(wc), CS_CLASSDC, WndProc,          0L,     0L, GetModuleHandle(nullptr), nullptr, nullptr,
+    WNDCLASSEXW wc = {sizeof(wc), CS_CLASSDC, c_func,           0L,     0L, GetModuleHandle(nullptr), nullptr, nullptr,
                       nullptr,    nullptr,    L"ImGui Example", nullptr};
     ::RegisterClassExW(&wc);
     HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Dear ImGui DirectX11 Example", WS_OVERLAPPEDWINDOW, 100, 100, 1280,
@@ -57,7 +75,7 @@ gali::EmulatorWindow::EmulatorWindow(void (&app_function)())
 
     // Setup Platform/Renderer backends
     ImGui_ImplWin32_Init(hwnd);
-    ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
+    ImGui_ImplDX11_Init(pd3dDevice, pd3dDeviceContext);
 
     // Load Fonts
     // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use
@@ -100,11 +118,11 @@ gali::EmulatorWindow::EmulatorWindow(void (&app_function)())
             break;
 
         // Handle window resize (we don't resize directly in the WM_SIZE handler)
-        if (g_ResizeWidth != 0 && g_ResizeHeight != 0)
+        if (ResizeWidth != 0 && ResizeHeight != 0)
         {
             CleanupRenderTarget();
-            g_pSwapChain->ResizeBuffers(0, g_ResizeWidth, g_ResizeHeight, DXGI_FORMAT_UNKNOWN, 0);
-            g_ResizeWidth = g_ResizeHeight = 0;
+            pSwapChain->ResizeBuffers(0, ResizeWidth, ResizeHeight, DXGI_FORMAT_UNKNOWN, 0);
+            ResizeWidth = ResizeHeight = 0;
             CreateRenderTarget();
         }
 
@@ -123,24 +141,24 @@ gali::EmulatorWindow::EmulatorWindow(void (&app_function)())
         ImGui::Render();
         const float clear_color_with_alpha[4] = {clear_color.x * clear_color.w, clear_color.y * clear_color.w,
                                                  clear_color.z * clear_color.w, clear_color.w};
-        g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, nullptr);
-        g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, clear_color_with_alpha);
+        pd3dDeviceContext->OMSetRenderTargets(1, &mainRenderTargetView, nullptr);
+        pd3dDeviceContext->ClearRenderTargetView(mainRenderTargetView, clear_color_with_alpha);
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
-        g_pSwapChain->Present(1, 0); // Present with vsync
+        pSwapChain->Present(1, 0); // Present with vsync
         // g_pSwapChain->Present(0, 0); // Present without vsync
     }
 
     // Cleanup
 }
 
-gali::EmulatorWindow::~EmulatorWindow()
+gali::ImguiWindow::~ImguiWindow()
 {
 }
 
 // Helper functions
 
-bool CreateDeviceD3D(HWND hWnd)
+bool gali::ImguiWindow::CreateDeviceD3D(HWND hWnd)
 {
     // Setup swap chain
     DXGI_SWAP_CHAIN_DESC sd;
@@ -167,12 +185,12 @@ bool CreateDeviceD3D(HWND hWnd)
         D3D_FEATURE_LEVEL_10_0,
     };
     HRESULT res = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, createDeviceFlags,
-                                                featureLevelArray, 2, D3D11_SDK_VERSION, &sd, &g_pSwapChain,
-                                                &g_pd3dDevice, &featureLevel, &g_pd3dDeviceContext);
+                                                featureLevelArray, 2, D3D11_SDK_VERSION, &sd, &pSwapChain, &pd3dDevice,
+                                                &featureLevel, &pd3dDeviceContext);
     if (res == DXGI_ERROR_UNSUPPORTED) // Try high-performance WARP software driver if hardware is not available.
         res = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_WARP, nullptr, createDeviceFlags,
-                                            featureLevelArray, 2, D3D11_SDK_VERSION, &sd, &g_pSwapChain, &g_pd3dDevice,
-                                            &featureLevel, &g_pd3dDeviceContext);
+                                            featureLevelArray, 2, D3D11_SDK_VERSION, &sd, &pSwapChain, &pd3dDevice,
+                                            &featureLevel, &pd3dDeviceContext);
     if (res != S_OK)
         return false;
 
@@ -180,40 +198,40 @@ bool CreateDeviceD3D(HWND hWnd)
     return true;
 }
 
-void CleanupDeviceD3D()
+void gali::ImguiWindow::CleanupDeviceD3D()
 {
     CleanupRenderTarget();
-    if (g_pSwapChain)
+    if (pSwapChain)
     {
-        g_pSwapChain->Release();
-        g_pSwapChain = nullptr;
+        pSwapChain->Release();
+        pSwapChain = nullptr;
     }
-    if (g_pd3dDeviceContext)
+    if (pd3dDeviceContext)
     {
-        g_pd3dDeviceContext->Release();
-        g_pd3dDeviceContext = nullptr;
+        pd3dDeviceContext->Release();
+        pd3dDeviceContext = nullptr;
     }
-    if (g_pd3dDevice)
+    if (pd3dDevice)
     {
-        g_pd3dDevice->Release();
-        g_pd3dDevice = nullptr;
+        pd3dDevice->Release();
+        pd3dDevice = nullptr;
     }
 }
 
-void CreateRenderTarget()
+void gali::ImguiWindow::CreateRenderTarget()
 {
     ID3D11Texture2D *pBackBuffer;
-    g_pSwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
-    g_pd3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, &g_mainRenderTargetView);
+    pSwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
+    pd3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, &mainRenderTargetView);
     pBackBuffer->Release();
 }
 
-void CleanupRenderTarget()
+void gali::ImguiWindow::CleanupRenderTarget()
 {
-    if (g_mainRenderTargetView)
+    if (mainRenderTargetView)
     {
-        g_mainRenderTargetView->Release();
-        g_mainRenderTargetView = nullptr;
+        mainRenderTargetView->Release();
+        mainRenderTargetView = nullptr;
     }
 }
 
@@ -227,7 +245,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or
 // clear/overwrite your copy of the keyboard data. Generally you may always pass all inputs to dear imgui, and hide them
 // from your application based on those two flags.
-LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT WINAPI gali::ImguiWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
         return true;
@@ -237,8 +255,8 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_SIZE:
         if (wParam == SIZE_MINIMIZED)
             return 0;
-        g_ResizeWidth = (UINT)LOWORD(lParam); // Queue resize
-        g_ResizeHeight = (UINT)HIWORD(lParam);
+        ResizeWidth = (UINT)LOWORD(lParam); // Queue resize
+        ResizeHeight = (UINT)HIWORD(lParam);
         return 0;
     case WM_SYSCOMMAND:
         if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
