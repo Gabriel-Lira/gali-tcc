@@ -8,6 +8,8 @@ project(
 
     DESCRIPTION
     "The TCC of Gabriel Al. Lira."
+
+    LANGUAGES C CXX
 )
 
 add_subdirectory(source)
