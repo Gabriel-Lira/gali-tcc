@@ -28,7 +28,7 @@ struct Callback<Ret(Params...)>
 template <typename Ret, typename... Params>
 std::function<Ret(Params...)> Callback<Ret(Params...)>::func;
 
-gali::ImguiWindow::ImguiWindow()
+gali::ImguiWindow::ImguiWindow(const ImguiWindowParams &params)
 {
     // Store member function and the instance using std::bind.
     // Callback<void(int *)>::func = std::bind(&gali::ImguiWindow::WndProc, &*this, std::placeholders::_1);
@@ -43,11 +43,11 @@ gali::ImguiWindow::ImguiWindow()
 
     // Create application window
     // ImGui_ImplWin32_EnableDpiAwareness();
-    wc = {sizeof(wc), CS_CLASSDC, c_func,           0L,     0L, GetModuleHandle(nullptr), nullptr, nullptr,
-          nullptr,    nullptr,    L"ImGui Example", nullptr};
+    wc = {sizeof(wc), CS_CLASSDC, c_func,         0L,     0L, GetModuleHandle(nullptr), nullptr, nullptr,
+          nullptr,    nullptr,    L"GALI Window", nullptr};
     ::RegisterClassExW(&wc);
-    hwnd = ::CreateWindowW(wc.lpszClassName, L"Dear ImGui DirectX11 Example", WS_OVERLAPPEDWINDOW, 100, 100, 1280, 800,
-                           nullptr, nullptr, wc.hInstance, nullptr);
+    hwnd = ::CreateWindowW(wc.lpszClassName, params.window_name.c_str(), WS_OVERLAPPEDWINDOW, params.x, params.y,
+                           params.nWidth, params.nHeight, nullptr, nullptr, wc.hInstance, nullptr);
 
     // Initialize Direct3D
     if (!CreateDeviceD3D())
@@ -64,14 +64,13 @@ gali::ImguiWindow::ImguiWindow()
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
+    io = &ImGui::GetIO();
+    io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+    io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
     (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
-    // ImGui::StyleColorsLight();
 
     // Setup Platform/Renderer backends
     ImGui_ImplWin32_Init(hwnd);
