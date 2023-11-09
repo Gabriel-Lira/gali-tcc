@@ -32,7 +32,6 @@ gali::ImguiWindow::ImguiWindow(const ImguiWindowParams &_params)
     : params(_params)
 {
     // Store member function and the instance using std::bind.
-    // Callback<void(int *)>::func = std::bind(&gali::ImguiWindow::WndProc, &*this, std::placeholders::_1);
     Callback<LRESULT WINAPI(HWND, UINT, WPARAM, LPARAM)>::func =
         std::bind(&gali::ImguiWindow::WndProc, this, std::placeholders::_1, std::placeholders::_2,
                   std::placeholders::_3, std::placeholders::_4);
@@ -130,7 +129,7 @@ void gali::ImguiWindow::run()
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
         pSwapChain->Present(1, 0); // Present with vsync
-        // g_pSwapChain->Present(0, 0); // Present without vsync
+        // pSwapChain->Present(0, 0); // Present without vsync
     }
 }
 
@@ -229,12 +228,6 @@ void gali::ImguiWindow::CleanupRenderTarget()
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 // Win32 message handler
-// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite
-// your copy of the mouse data.
-// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or
-// clear/overwrite your copy of the keyboard data. Generally you may always pass all inputs to dear imgui, and hide them
-// from your application based on those two flags.
 LRESULT WINAPI gali::ImguiWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
