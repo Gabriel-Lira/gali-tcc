@@ -8,6 +8,7 @@ add_executable(
     main_emulator.cpp
 
     ./src/imgui_window.cpp
+    ./src/emulator_window.cpp
 )
 
 target_include_directories(

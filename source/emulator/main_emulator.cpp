@@ -1,14 +1,8 @@
-#include "imgui_window.hpp"
-
-void test()
-{
-}
+#include "emulator_window.hpp"
 
 int main(int argc, char const *argv[])
 {
-    const gali::ImguiWindowParams emulator_params{L"GALI Reader Emulator",     100, 100, 1280, 800,
-                                                  {0.0f, 0.55f, 0.60f, 0.60f}, test};
-    static gali::ImguiWindow emulator_win(emulator_params);
+    static gali::EmulatorWindow emulator_win;
 
     emulator_win.run();
 

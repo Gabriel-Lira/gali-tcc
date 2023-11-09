@@ -1,9 +1,9 @@
 #include <d3d11.h>
 #include <tchar.h>
 
-#include "imgui.h"
-#include "imgui_impl_dx11.h"
-#include "imgui_impl_win32.h"
+#include <imgui.h>
+#include <imgui_impl_dx11.h>
+#include <imgui_impl_win32.h>
 
 #include "imgui_window.hpp"
 
@@ -110,12 +110,7 @@ void gali::ImguiWindow::run()
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
 
-        params.app_window_function();
-
-        ImGui::Begin("Another Window");
-        ImGui::Text("Hello from another window!");
-        ImGui::Text("Application FPS %.1f", io->Framerate);
-        ImGui::End();
+        app_window_function();
 
         // Rendering
         ImGui::Render();
@@ -143,6 +138,11 @@ gali::ImguiWindow::~ImguiWindow()
     CleanupDeviceD3D();
     ::DestroyWindow(hwnd);
     ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
+}
+
+void gali::ImguiWindow::app_window_function()
+{
+    ImGui::Text("Você não deveria estar vendo isso =), bugou tudo!");
 }
 
 // Helper functions
