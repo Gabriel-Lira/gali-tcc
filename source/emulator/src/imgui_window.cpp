@@ -28,7 +28,8 @@ struct Callback<Ret(Params...)>
 template <typename Ret, typename... Params>
 std::function<Ret(Params...)> Callback<Ret(Params...)>::func;
 
-gali::ImguiWindow::ImguiWindow(const ImguiWindowParams &params)
+gali::ImguiWindow::ImguiWindow(const ImguiWindowParams &_params)
+    : params(_params)
 {
     // Store member function and the instance using std::bind.
     // Callback<void(int *)>::func = std::bind(&gali::ImguiWindow::WndProc, &*this, std::placeholders::_1);
@@ -77,11 +78,8 @@ gali::ImguiWindow::ImguiWindow(const ImguiWindowParams &params)
     ImGui_ImplDX11_Init(pd3dDevice, pd3dDeviceContext);
 }
 
-void gali::ImguiWindow::run(void (&app_function)())
+void gali::ImguiWindow::run()
 {
-    // Our state
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
     // Main loop
     bool done = false;
     while (!done)
@@ -113,16 +111,20 @@ void gali::ImguiWindow::run(void (&app_function)())
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
 
-        app_function();
+        params.app_window_function();
 
         ImGui::Begin("Another Window");
         ImGui::Text("Hello from another window!");
+        ImGui::Text("Application FPS %.1f", io->Framerate);
         ImGui::End();
 
         // Rendering
         ImGui::Render();
-        const float clear_color_with_alpha[4] = {clear_color.x * clear_color.w, clear_color.y * clear_color.w,
-                                                 clear_color.z * clear_color.w, clear_color.w};
+        const float clear_color_with_alpha[4] = {params.background_color.x * params.background_color.w,
+                                                 params.background_color.y * params.background_color.w,
+                                                 params.background_color.z * params.background_color.w,
+                                                 params.background_color.w};
+
         pd3dDeviceContext->OMSetRenderTargets(1, &mainRenderTargetView, nullptr);
         pd3dDeviceContext->ClearRenderTargetView(mainRenderTargetView, clear_color_with_alpha);
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

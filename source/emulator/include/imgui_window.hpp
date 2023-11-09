@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <string>
 
 #include <d3d11.h>
@@ -18,18 +19,22 @@ public:
     int y;
     int nWidth;
     int nHeight;
+    ImVec4 background_color;
+    std::function<void()> app_window_function;
 };
 
 class ImguiWindow
 {
 private:
+    const ImguiWindowParams &params;
+
     ImGuiIO *io;
 
     ID3D11Device *pd3dDevice = nullptr;
     ID3D11DeviceContext *pd3dDeviceContext = nullptr;
     IDXGISwapChain *pSwapChain = nullptr;
-    UINT ResizeWidth = 0, ResizeHeight = 0;
     ID3D11RenderTargetView *mainRenderTargetView = nullptr;
+    UINT ResizeWidth = 0, ResizeHeight = 0;
 
     WNDCLASSEXW wc;
     HWND hwnd;
@@ -42,8 +47,8 @@ private:
     LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 public:
-    ImguiWindow(const ImguiWindowParams &params);
-    void run(void (&app_function)());
+    ImguiWindow(const ImguiWindowParams &_params);
+    void run();
     ~ImguiWindow();
 };
 
