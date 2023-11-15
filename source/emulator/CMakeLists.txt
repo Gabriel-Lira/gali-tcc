@@ -27,6 +27,14 @@ target_link_libraries(
         
 )
 
+target_compile_features(
+    ${EMULATOR_EXEC_NAME}
+
+    PUBLIC
+        c_std_11
+        cxx_std_17
+)
+
 add_custom_target(
     emulator_run
 
