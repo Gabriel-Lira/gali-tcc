@@ -30,12 +30,24 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
             }
+        },
+        {
+            "name": "win-dbg",
+            "displayName": "Windows Release Config",
+            "inherits": "win-default",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
         }
     ],
     "buildPresets": [
         {
             "name": "win-rel",
             "configurePreset": "win-rel"
+        },
+        {
+            "name": "win-dbg",
+            "configurePreset": "win-dbg"
         }
     ]
 }
