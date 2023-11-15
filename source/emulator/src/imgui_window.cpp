@@ -46,7 +46,7 @@ gali::ImguiWindow::ImguiWindow(const ImguiWindowParams &_params)
     wc = {sizeof(wc), CS_CLASSDC, c_func,         0L,     0L, GetModuleHandle(nullptr), nullptr, nullptr,
           nullptr,    nullptr,    L"GALI Window", nullptr};
     ::RegisterClassExW(&wc);
-    hwnd = ::CreateWindowW(wc.lpszClassName, params.window_name.c_str(), WS_OVERLAPPEDWINDOW, params.x, params.y,
+    hwnd = ::CreateWindowW(wc.lpszClassName, params.window_name.data(), WS_OVERLAPPEDWINDOW, params.x, params.y,
                            params.nWidth, params.nHeight, nullptr, nullptr, wc.hInstance, nullptr);
 
     // Initialize Direct3D

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <string_view>
 
 #include <d3d11.h>
 #include <tchar.h>
@@ -13,7 +13,7 @@ namespace gali
 class ImguiWindowParams
 {
 public:
-    std::wstring window_name;
+    std::wstring_view window_name;
     int x;
     int y;
     int nWidth;

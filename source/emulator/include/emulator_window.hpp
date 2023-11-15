@@ -8,7 +8,8 @@ namespace gali
 class EmulatorWindow : public ImguiWindow
 {
 private:
-    const ImguiWindowParams imgui_window_params;
+    static constexpr gali::ImguiWindowParams imgui_window_params{L"GALI Reader Emulator",    100, 100, 1280, 800,
+                                                                 {0.0f, 0.55f, 0.60f, 0.60f}};
 
     void app_window_function() override;
 
