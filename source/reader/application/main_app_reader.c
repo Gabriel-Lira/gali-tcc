@@ -1,8 +1,11 @@
 
 #include <stdio.h>
 
-int main(int argc, char const *argv[]) {
-  printf("oi!\n");
+#include "app.h"
 
-  return 0;
+void main(void)
+{
+    (void)app_run();
+
+    printf("oi!\n");
 }

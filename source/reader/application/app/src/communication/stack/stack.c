@@ -9,6 +9,11 @@ bool comm_stack_process_service(CommStackCtx *stack_ctx, CommLayerPositionType p
 {
     CommLayerCtx *const layer_ctx_to_execute = comm_layer_get_next_to_execute(stack_ctx, position_type);
 
+    if (layer_ctx_to_execute == NULL)
+    {
+        return false;
+    }
+
     return comm_layer_process_service(layer_ctx_to_execute, COMM_LAYER__SAME, command, response);
 }
 
