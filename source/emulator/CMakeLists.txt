@@ -7,6 +7,7 @@ add_executable(
 
     main_emulator.cpp
 
+    ./src/com_ports.cpp
     ./src/imgui_window.cpp
     ./src/emulator_window.cpp
 )
@@ -24,6 +25,7 @@ target_link_libraries(
     PUBLIC
         # GALI::utils
         GALI_IMGUI_LIB
+        serial_SRCS
         
 )
 

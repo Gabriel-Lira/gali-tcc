@@ -4,3 +4,6 @@
 [submodule "source/libs/imgui"]
 	path = source/libs/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "source/libs/serial/serial"]
+	path = source/libs/serial/serial
+	url = https://github.com/wjwwood/serial.git
