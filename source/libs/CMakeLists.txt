@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.21)
 # add_subdirectory(utils)
 add_subdirectory(serial)
 
+# TODO: remove gui from here
 # Lib source
 set(LIB_GUI_NAME GALI_IMGUI_LIB)
 

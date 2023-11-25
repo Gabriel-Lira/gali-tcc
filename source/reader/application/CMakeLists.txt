@@ -1,18 +1,25 @@
 cmake_minimum_required(VERSION 3.20)
 
 # SRC Lib
-
 set(READER_APP_SRC_NAME ${CMAKE_PROJECT_NAME}_READER_APP_SRC)
 
 add_library(
     ${READER_APP_SRC_NAME}
 
-    ./app/src/app.c
-
     ./app/src/communication/physical/physical.c
 
     ./app/src/communication/stack/stack.c
     ./app/src/communication/stack/layer/layer.c
+    
+    ./src/tasks/fsm/fsm.c
+    
+    ./src/tasks/types/task_periodic.c
+    
+    ./src/tasks/queue.c
+    ./src/tasks/task_scheduler.c
+    ./src/tasks/task.c
+
+    ./app/src/app.c
 )
 
 target_include_directories(
@@ -20,10 +27,10 @@ target_include_directories(
 
     PUBLIC
         ./app/include
+        ${READER_HAL_INTERFACE}
 )
 
 # App Executable
-
 set(READER_APP_EXEC_NAME ${CMAKE_PROJECT_NAME}_READER_APP)
 
 add_executable(
