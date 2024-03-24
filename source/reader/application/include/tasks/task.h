@@ -34,7 +34,8 @@ typedef struct TaskContext
 
 } TaskContext;
 
-void task_init(TaskContext *);
+void task_init(TaskContext *, TaskData *, const TaskProperties *);
+void task_data_init(TaskData *, const EvtQueueProperties *, FsmState);
 void task_sleep(TaskContext *, TaskSleepTime sleep_milliseconds);
 bool task_must_wake_up(TaskContext *);
 void task_wake_up(TaskContext *);

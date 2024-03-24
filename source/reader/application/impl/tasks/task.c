@@ -1,9 +1,17 @@
 #include "tasks/task.h"
 
-void task_init(TaskContext *task_ctx)
+void task_init(TaskContext *task_ctx, TaskData *task_data, const TaskProperties *task_properties)
 {
-    evt_queue_init(&task_ctx->data->queue_ctx);
-    task_restart_sleep(task_ctx);
+    task_ctx->data = task_data;
+    task_ctx->properties = task_properties;
+}
+
+void task_data_init(TaskData *task_data, const EvtQueueProperties *queue_properties, FsmState fsm_initial_state)
+{
+    task_data->slept_milliseconds = 0;
+
+    evt_queue_init(&task_data->queue_ctx, queue_properties);
+    fsm_init(&task_data->fsm_ctx, fsm_initial_state);
 }
 
 void task_sleep(TaskContext *task_ctx, TaskSleepTime sleep_milliseconds)

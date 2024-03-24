@@ -8,16 +8,16 @@ if(NOT CMAKE_CROSSCOMPILING)
 
         main_emulator.cpp
 
-        ./src/com_ports.cpp
-        ./src/imgui_window.cpp
-        ./src/emulator_window.cpp
+        ./application/impl/com_ports.cpp
+        ./application/impl/imgui_window.cpp
+        ./application/impl/emulator_window.cpp
     )
 
     target_include_directories(
         ${EMULATOR_EXEC_NAME}
 
         PUBLIC
-            ./include
+            ./application/include
     )
 
     target_link_libraries(

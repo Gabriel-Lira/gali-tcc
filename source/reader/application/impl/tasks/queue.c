@@ -1,10 +1,11 @@
 #include "tasks/queue.h"
 
-void evt_queue_init(EvtQueueCtx *queue_ctx)
+void evt_queue_init(EvtQueueCtx *queue_ctx, const EvtQueueProperties *queue_properties)
 {
     // TODO: ASSERT queue_ctx->properties != null
     // TODO: ASSERT queue_ctx->properties->evt_array_ptr != null
 
+    queue_ctx->properties = queue_properties;
     queue_ctx->evt_usage_size = 0;
 }
 

@@ -6,27 +6,26 @@ set(READER_APP_SRC_NAME ${CMAKE_PROJECT_NAME}_READER_APP_SRC)
 add_library(
     ${READER_APP_SRC_NAME}
 
-    ./app/src/communication/physical/physical.c
+    ./impl/communication/physical/physical.c
 
-    ./app/src/communication/stack/stack.c
-    ./app/src/communication/stack/layer/layer.c
+    ./impl/communication/stack/layer/layer.c
+    ./impl/communication/stack/stack.c
     
-    ./src/tasks/fsm/fsm.c
-    
-    ./src/tasks/types/task_periodic.c
-    
-    ./src/tasks/queue.c
-    ./src/tasks/task_scheduler.c
-    ./src/tasks/task.c
+    ./impl/tasks/fsm/fsm.c
+    ./impl/tasks/types/task_periodic.c
+    ./impl/tasks/queue.c
+    ./impl/tasks/task_manager.c
+    ./impl/tasks/task_scheduler.c
+    ./impl/tasks/task.c
 
-    ./app/src/app.c
+    ./impl/app.c
 )
 
 target_include_directories(
     ${READER_APP_SRC_NAME}
 
     PUBLIC
-        ./app/include
+        ./include
         ${READER_HAL_INTERFACE}
 )
 
@@ -36,7 +35,7 @@ set(READER_APP_EXEC_NAME ${CMAKE_PROJECT_NAME}_READER_APP)
 add_executable(
     ${READER_APP_EXEC_NAME}
 
-    main_app_reader.c
+    ./main_app_reader.c
 )
 
 target_link_libraries(
@@ -58,4 +57,3 @@ add_custom_target(
 
     USES_TERMINAL
 )
-

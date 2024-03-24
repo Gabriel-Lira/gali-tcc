@@ -23,7 +23,7 @@ typedef struct TaskSchedulerContext
 
 } TaskSchedulerContext;
 
-void task_scheduler_init(TaskSchedulerContext *);
+void task_scheduler_init(TaskSchedulerContext *, const TaskSchedulerProperties *);
 bool task_scheduler_execute(TaskSchedulerContext *, TaskSleepTime sleep_milliseconds);
 
 #ifdef __cplusplus

@@ -1,11 +1,9 @@
-
-#include <stdio.h>
-
 #include "app.h"
 
 void main(void)
 {
-    (void)app_run();
+    static AppData app_data;
+    static CREATE_APP_RESOURCES(app_resources);
 
-    printf("oi!\n");
+    app_auto_execute(&app_data, &app_resources);
 }

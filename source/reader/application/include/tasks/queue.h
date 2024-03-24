@@ -24,7 +24,7 @@ typedef struct EvtQueueCtx
 
 } EvtQueueCtx;
 
-void evt_queue_init(EvtQueueCtx *);
+void evt_queue_init(EvtQueueCtx *, const EvtQueueProperties *);
 bool evt_queue_push(EvtQueueCtx *, Event *);
 Event *evt_queue_pop(EvtQueueCtx *);
 
